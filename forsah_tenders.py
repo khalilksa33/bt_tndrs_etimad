@@ -510,6 +510,21 @@ def main():
             companies = conn.execute("SELECT * FROM companies WHERE email = ?", (args.email,)).fetchall()
         else:
             companies = conn.execute("SELECT * FROM companies WHERE (status IS NULL OR status = 'Active') AND (portals IS NULL OR portals = 'Both' OR portals = 'Forsah')").fetchall()
+            
+            # Filter by scheduled time
+            current_hour = datetime.now().strftime("%H:00")
+            filtered_companies = []
+            for c in companies:
+                try:
+                    c_times = dict(c).get('report_times')
+                except Exception:
+                    c_times = None
+                if not c_times:
+                    c_times = "09:00,11:00,13:00,15:00"
+                if current_hour in c_times.split(','):
+                    filtered_companies.append(c)
+            companies = filtered_companies
+            
     except sqlite3.OperationalError:
         companies = []
     conn.close()

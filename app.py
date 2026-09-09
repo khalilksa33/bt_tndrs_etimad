@@ -721,7 +721,7 @@ ADMIN_HTML = '''<!DOCTYPE html>
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan & Portals</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan, Portals & Schedule</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status & Expiry</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                             </tr>
@@ -943,8 +943,8 @@ def subscribe():
     try:
         conn.execute('''
             INSERT INTO companies 
-            (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date, report_times) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date))
         conn.commit()
         # Trigger immediate test report for new subscriber
@@ -1033,8 +1033,8 @@ def admin_add():
         try:
             conn.execute('''
                 INSERT INTO companies 
-            (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date, report_times) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date))
             conn.commit()
             
@@ -1067,12 +1067,14 @@ def admin_edit(id):
         status = request.form.get('status', 'Active')
         portals = request.form.get('portals', 'Both')
         expiry_date = request.form.get('expiry_date', '')
+        report_times = ','.join(request.form.getlist('report_times')) or '09:00,11:00,13:00,15:00'
+    report_times = ','.join(request.form.getlist('report_times')) or '09:00,11:00,13:00,15:00'
         
         conn.execute('''
             UPDATE companies 
-            SET name=?, email=?, phone=?, contact_person=?, cr_number=?, industry=?, language=?, subscription_type=?, status=?, portals=?, expiry_date=?
+            SET name=?, email=?, phone=?, contact_person=?, cr_number=?, industry=?, language=?, subscription_type=?, status=?, portals=?, expiry_date=?, report_times=?
             WHERE id=?
-        ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date, id))
+        ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date, report_times, id))
         conn.commit()
         conn.close()
         return redirect(url_for('admin'))
