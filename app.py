@@ -1078,7 +1078,6 @@ def admin_edit(id):
         portals = request.form.get('portals', 'Both')
         expiry_date = request.form.get('expiry_date', '')
         report_times = ','.join(request.form.getlist('report_times')) or '09:00,11:00,13:00,15:00'
-    report_times = ','.join(request.form.getlist('report_times')) or '09:00,11:00,13:00,15:00'
         
         conn.execute('''
             UPDATE companies 
