@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from flask import Flask, render_template_string, request, redirect, url_for, Response, send_from_directory
 import sqlite3
 import os
@@ -937,7 +938,11 @@ def subscribe():
     cr = request.form.get('cr_number', '')
     industry = request.form.get('industry', '')
     language = request.form.get('language', 'English')
-    sub_type = request.form.get('subscription_type', 'Monthly')
+    sub_type = request.form.get('subscription_type', 'Personal')
+    report_times = ','.join(request.form.getlist('report_times')) or '09:00,11:00,13:00,15:00'
+    status = 'Active'
+    portals = 'Both'
+    expiry_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
     
     conn = get_db()
     try:
@@ -945,12 +950,13 @@ def subscribe():
             INSERT INTO companies 
             (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date, report_times) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date))
+        ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date, report_times))
         conn.commit()
         # Trigger immediate test report for new subscriber
         try:
             # We assume it runs from the project root
             subprocess.Popen(f"venv/bin/python3 forsah_tenders.py --email '{email}' >> test_report.log 2>&1", shell=True)
+            subprocess.Popen(f"venv/bin/python3 etimad_tenders.py --email '{email}' >> test_report.log 2>&1", shell=True)
         except Exception as e:
             print("Failed to trigger report:", e)
     except sqlite3.IntegrityError:
@@ -1028,14 +1034,18 @@ def admin_add():
         industry = request.form.get('industry', '')
         language = request.form.get('language', 'English')
         sub_type = request.form.get('subscription_type', 'Monthly')
+        status = request.form.get('status', 'Active')
+        portals = request.form.get('portals', 'Both')
+        expiry_date = request.form.get('expiry_date', '')
+        report_times = ','.join(request.form.getlist('report_times')) or '09:00,11:00,13:00,15:00'
         
         conn = get_db()
         try:
             conn.execute('''
                 INSERT INTO companies 
-            (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date, report_times) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date))
+                (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date, report_times) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date, report_times))
             conn.commit()
             
         except sqlite3.IntegrityError:

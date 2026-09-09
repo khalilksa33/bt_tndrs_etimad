@@ -1,19 +1,36 @@
 import re
 
-with open('etimad_tenders.py', 'r', encoding='utf-8') as f:
+with open('app.py', 'r', encoding='utf-8') as f:
     code = f.read()
 
-old_opts = '''    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")'''
+admin_add_pattern = r"def admin_add\(\):.*?except sqlite3\.IntegrityError:"
+new_admin_add = '''def admin_add():
+    if request.method == 'POST':
+        name = request.form.get('name', '')
+        email = request.form.get('email', '')
+        phone = request.form.get('phone', '')
+        contact = request.form.get('contact_person', '')
+        cr = request.form.get('cr_number', '')
+        industry = request.form.get('industry', '')
+        language = request.form.get('language', 'English')
+        sub_type = request.form.get('subscription_type', 'Monthly')
+        status = request.form.get('status', 'Active')
+        portals = request.form.get('portals', 'Both')
+        expiry_date = request.form.get('expiry_date', '')
+        report_times = ','.join(request.form.getlist('report_times')) or '09:00,11:00,13:00,15:00'
+        
+        conn = get_db()
+        try:
+            conn.execute(\'''
+                INSERT INTO companies 
+                (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date, report_times) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            \''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date, report_times))
+            conn.commit()
+            
+        except sqlite3.IntegrityError:'''
 
-new_opts = '''    chrome_options.add_argument("--headless=new")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--remote-debugging-port=9222")'''
+code = re.sub(admin_add_pattern, new_admin_add, code, flags=re.DOTALL)
 
-code = code.replace(old_opts, new_opts)
-
-with open('etimad_tenders.py', 'w', encoding='utf-8') as f:
+with open('app.py', 'w', encoding='utf-8') as f:
     f.write(code)
