@@ -524,7 +524,7 @@ def main():
             company_pdf_name = os.path.join(report_dir, f"forsah_tenders_report_{today}_{c_name.replace(' ', '_')}.pdf")
             print(f"📄 Building Forsah PDF for {c_name} (Language: {c_lang}): {company_pdf_name}")
             
-            pdf_rows = arabic_rows if c_lang == "Arabic" else english_rows
+            pdf_rows = arabic_rows if c_lang in ["Arabic", "العربية"] else english_rows
             build_pdf(pdf_rows, company_pdf_name, company_name=c_name, logo_path=c_logo)
             
             print(f"✉️ Sending Forsah email with PDF to {c_email}...")
