@@ -270,8 +270,7 @@ def fetch_rows():
         for card in cards:
             try:
                 # Basic generic extraction strategy for Etimad
-                text_content = card.text.split('
-')
+                text_content = card.text.split('\n')
                 
                 title = text_content[0] if len(text_content) > 0 else 'N/A'
                 publisher = text_content[1] if len(text_content) > 1 else 'Etimad Entity'
