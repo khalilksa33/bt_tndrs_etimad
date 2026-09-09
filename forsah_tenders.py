@@ -509,7 +509,7 @@ def main():
         if args.email:
             companies = conn.execute("SELECT * FROM companies WHERE email = ?", (args.email,)).fetchall()
         else:
-            companies = conn.execute("SELECT * FROM companies").fetchall()
+            companies = conn.execute("SELECT * FROM companies WHERE (status IS NULL OR status = 'Active') AND (portals IS NULL OR portals = 'Both' OR portals = 'Forsah')").fetchall()
     except sqlite3.OperationalError:
         companies = []
     conn.close()

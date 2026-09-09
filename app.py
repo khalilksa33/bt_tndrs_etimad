@@ -721,7 +721,8 @@ ADMIN_HTML = '''<!DOCTYPE html>
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan & Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan & Portals</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status & Expiry</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                             </tr>
                         </thead>
@@ -942,9 +943,9 @@ def subscribe():
     try:
         conn.execute('''
             INSERT INTO companies 
-            (name, email, phone, contact_person, cr_number, industry, language, subscription_type) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (name, email, phone, contact, cr, industry, language, sub_type))
+            (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date))
         conn.commit()
         # Trigger immediate test report for new subscriber
         try:
@@ -1032,9 +1033,9 @@ def admin_add():
         try:
             conn.execute('''
                 INSERT INTO companies 
-                (name, email, phone, contact_person, cr_number, industry, language, subscription_type) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, email, phone, contact, cr, industry, language, sub_type))
+            (name, email, phone, contact_person, cr_number, industry, language, subscription_type, status, portals, expiry_date) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date))
             conn.commit()
             
         except sqlite3.IntegrityError:
@@ -1063,12 +1064,15 @@ def admin_edit(id):
         industry = request.form.get('industry', '')
         language = request.form.get('language', 'English')
         sub_type = request.form.get('subscription_type', 'Monthly')
+        status = request.form.get('status', 'Active')
+        portals = request.form.get('portals', 'Both')
+        expiry_date = request.form.get('expiry_date', '')
         
         conn.execute('''
             UPDATE companies 
-            SET name=?, email=?, phone=?, contact_person=?, cr_number=?, industry=?, language=?, subscription_type=?
+            SET name=?, email=?, phone=?, contact_person=?, cr_number=?, industry=?, language=?, subscription_type=?, status=?, portals=?, expiry_date=?
             WHERE id=?
-        ''', (name, email, phone, contact, cr, industry, language, sub_type, id))
+        ''', (name, email, phone, contact, cr, industry, language, sub_type, status, portals, expiry_date, id))
         conn.commit()
         conn.close()
         return redirect(url_for('admin'))
