@@ -1,7 +1,4 @@
-with open('app.py', 'r', encoding='utf-8') as f:
-    code = f.read()
-
-code = code.replace("<div>                          <div>\n                              <label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300\">Subscription Type</label>", "                          <div>\n                              <label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300\">Subscription Type</label>")
-
-with open('app.py', 'w', encoding='utf-8') as f:
-    f.write(code)
+import re
+with open('etimad_tenders.py', 'r', encoding='utf-8') as f: code = f.read()
+code = code.replace("ChromeDriverManager().install()", "ChromeDriverManager(driver_version='152.0.7977.64').install()")
+with open('etimad_tenders.py', 'w', encoding='utf-8') as f: f.write(code)
