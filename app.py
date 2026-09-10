@@ -49,7 +49,11 @@ def init_db():
             cr_number TEXT,
             industry TEXT,
             language TEXT,
-            subscription_type TEXT
+            subscription_type TEXT,
+            status TEXT DEFAULT 'Active',
+            portals TEXT DEFAULT 'Both',
+            expiry_date TEXT,
+            report_times TEXT DEFAULT '09:00,11:00,13:00,15:00'
         )
     ''')
     conn.execute('''
