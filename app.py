@@ -311,15 +311,50 @@ LANDING_PAGE_HTML_EN = '''
                         </div>
                     </div>
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preferred Report Times (Hold Ctrl/Cmd for multiple)</label>
-                        <select name="report_times" multiple class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border p-3 bg-gray-50 dark:bg-gray-700 dark:text-white h-32">
-                            <option value="09:00" selected>09:00 AM</option>
-                            <option value="11:00" selected>11:00 AM</option>
-                            <option value="13:00" selected>01:00 PM</option>
-                            <option value="15:00" selected>03:00 PM</option>
-                            <option value="17:00">05:00 PM</option>
-                            <option value="19:00">07:00 PM</option>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Preferred Report Times</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="09:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">09:00 AM</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="11:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">11:00 AM</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="13:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">01:00 PM</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="15:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">03:00 PM</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="17:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">05:00 PM</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="19:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">07:00 PM</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Select Portals</label>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="portals" value="Both" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" checked>
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Forsah & Etimad</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="portals" value="Forsah" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Forsah Only</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="portals" value="Etimad" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Etimad Only</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="pt-4">
                         <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150">
@@ -618,15 +653,50 @@ LANDING_PAGE_HTML_AR = '''
                         </div>
                     </div>
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">أوقات استلام التقرير المفضلة (اضغط Ctrl/Cmd لاختيار أكثر من وقت)</label>
-                        <select name="report_times" multiple class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border p-3 bg-gray-50 dark:bg-gray-700 dark:text-white h-32">
-                            <option value="09:00" selected>09:00 صباحاً</option>
-                            <option value="11:00" selected>11:00 صباحاً</option>
-                            <option value="13:00" selected>01:00 مساءً</option>
-                            <option value="15:00" selected>03:00 مساءً</option>
-                            <option value="17:00">05:00 مساءً</option>
-                            <option value="19:00">07:00 مساءً</option>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">أوقات استلام التقرير المفضلة</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="09:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">09:00 صباحاً</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="11:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">11:00 صباحاً</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="13:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">01:00 مساءً</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="15:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">03:00 مساءً</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="17:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">05:00 مساءً</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="report_times" value="19:00" class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">07:00 مساءً</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">اختر المنصات</label>
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="portals" value="Both" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" checked>
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">منصة فرص واعتماد</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="portals" value="Forsah" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">منصة فرص فقط</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="portals" value="Etimad" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                <span class="mr-2 text-sm text-gray-700 dark:text-gray-300">منصة اعتماد فقط</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="pt-4">
                         <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150">
@@ -963,7 +1033,7 @@ def subscribe():
     sub_type = request.form.get('subscription_type', 'Personal')
     report_times = ','.join(request.form.getlist('report_times')) or '09:00,11:00,13:00,15:00'
     status = 'Active'
-    portals = 'Both'
+    portals = request.form.get('portals', 'Both')
     expiry_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
     
     conn = get_db()
