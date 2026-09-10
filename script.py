@@ -1,10 +1,8 @@
-import re
-
-pdf_logic = '''
+pdf_logic = r'''
 def render_arabic(text):
     if not text: return text
     text_str = str(text)
-    if not any('\\u0600' <= c <= '\\u06FF' for c in text_str):
+    if not any('\u0600' <= c <= '\u06FF' for c in text_str):
         return text_str
     try:
         import arabic_reshaper
@@ -17,6 +15,7 @@ def render_arabic(text):
 def draw_page_header(canvas_obj, doc, company_name=None, logo_path=None):
     from reportlab.lib.units import mm
     from reportlab.platypus import Image
+    import os
     width, height = doc.pagesize
     top_y = height - 16 * mm
     if logo_path and os.path.exists(logo_path):
@@ -76,15 +75,13 @@ def build_pdf(rows, path, company_name=None, logo_path=None):
         "Ref Value", "Publish Date", "Inquiry Date", 
         "Submit Date", "Opening Date", "Price"
     ]
-    # Translate headers to Arabic if any arabic rows
-    if rows and any('\\u0600' <= c <= '\\u06FF' for cell in rows[0] for c in str(cell)):
+    if rows and any('\u0600' <= c <= '\u06FF' for cell in rows[0] for c in str(cell)):
         headers = [
             "العنوان", "الناشر", "النوع", "النشاط", "التصنيف",
             "القيمة المرجعية", "تاريخ النشر", "اخر موعد للاستفسارات",
             "اخر موعد للتقديم", "تاريخ فتح المظاريف", "قيمة الكراسة"
         ]
 
-    # Reverse headers visually? No, Table does LTR
     rendered_headers = [Paragraph(render_arabic(h), ParagraphStyle('h', fontName=font_name, fontSize=8, textColor=colors.white)) for h in headers]
     data = [rendered_headers]
     
@@ -125,12 +122,14 @@ for filename in ['forsah_tenders.py', 'etimad_tenders.py']:
     with open(filename, 'r', encoding='utf-8') as f:
         code = f.read()
 
-    # Find the start of PDF logic. In forsah it starts with draw_page_header. In etimad it starts with build_pdf.
-    if 'def draw_page_header' in code:
-        code = re.sub(r'def draw_page_header.*?def main\(', pdf_logic + '\ndef main(', code, flags=re.DOTALL)
-    else:
-        code = re.sub(r'def build_pdf.*?def main\(', pdf_logic + '\ndef main(', code, flags=re.DOTALL)
-
-    with open(filename, 'w', encoding='utf-8') as f:
-        f.write(code)
+    start_idx = code.find('def draw_page_header')
+    if start_idx == -1:
+        start_idx = code.find('def build_pdf')
+    
+    end_idx = code.find('def main(')
+    
+    if start_idx != -1 and end_idx != -1:
+        code = code[:start_idx] + pdf_logic + '\n' + code[end_idx:]
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(code)
 

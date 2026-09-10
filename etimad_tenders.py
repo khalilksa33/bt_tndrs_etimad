@@ -310,127 +310,123 @@ def fetch_rows():
         
     return arabic_rows
 
+
+def render_arabic(text):
+    if not text: return text
+    text_str = str(text)
+    if not any('\u0600' <= c <= '\u06FF' for c in text_str):
+        return text_str
+    try:
+        import arabic_reshaper
+        from bidi.algorithm import get_display
+        reshaped_text = arabic_reshaper.reshape(text_str)
+        return get_display(reshaped_text)
+    except:
+        return text_str
+
+def draw_page_header(canvas_obj, doc, company_name=None, logo_path=None):
+    from reportlab.lib.units import mm
+    from reportlab.platypus import Image
+    import os
+    width, height = doc.pagesize
+    top_y = height - 16 * mm
+    if logo_path and os.path.exists(logo_path):
+        img = Image(logo_path)
+        img.drawHeight = 15 * mm
+        img.drawWidth = (img.drawHeight / img.imageHeight) * img.imageWidth
+        img.drawOn(canvas_obj, width - doc.rightMargin - img.drawWidth, top_y - img.drawHeight)
+    if company_name:
+        canvas_obj.saveState()
+        canvas_obj.setFont("Amiri", 12)
+        canvas_obj.drawString(doc.leftMargin, top_y, render_arabic("Report for: " + company_name))
+        canvas_obj.restoreState()
+
+def add_footer(canvas_obj, doc):
+    from reportlab.lib.units import mm
+    canvas_obj.saveState()
+    canvas_obj.setFont("Helvetica", 8)
+    footer_text = f"Page {doc.page}"
+    canvas_obj.drawCentredString(doc.pagesize[0] / 2.0, 10 * mm, footer_text)
+    canvas_obj.restoreState()
+
 def build_pdf(rows, path, company_name=None, logo_path=None):
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import landscape, A4
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.lib.units import mm
+    import os
+
+    try:
+        pdfmetrics.registerFont(TTFont('Amiri', 'Amiri-Regular.ttf'))
+        font_name = 'Amiri'
+    except Exception as e:
+        print("Font error:", e)
+        font_name = 'Helvetica'
+
     styles = getSampleStyleSheet()
-    story = []
     title_style = ParagraphStyle(
         'reportTitle',
         parent=styles['Title'],
         alignment=1,
-        fontName='Helvetica-Bold',
-        fontSize=9,
-        leading=11,
+        fontName=font_name,
+        fontSize=14,
+        leading=16,
         spaceAfter=4 * mm,
     )
-    story.append(Paragraph(REPORT_TITLE, title_style))
-    timestamp_style = ParagraphStyle(
-        'reportTimestamp',
-        parent=styles['Normal'],
-        alignment=1,
-        fontName='Helvetica',
-        fontSize=10,
-        leading=12,
-        textColor=colors.grey,
-        spaceAfter=4 * mm,
-    )
-    story.append(Paragraph(datetime.now().strftime('Generated on %Y-%m-%d %H:%M'), timestamp_style))
+    
+    story = []
+    title_text = render_arabic("Automated Tenders Report")
+    story.append(Paragraph(title_text, title_style))
+    story.append(Spacer(1, 10 * mm))
+
     headers = [
-        "#",
-        "Tender title",
-        "Publisher",
-        "Category",
-        "Type",
-        "Activity",
-        "Ref no.",
-        "Publication",
-        "Inquiry deadline",
-        "Submission deadline",
-        "Opening",
-        "Doc price",
+        "Title", "Publisher", "Type", "Activity", "Category", 
+        "Ref Value", "Publish Date", "Inquiry Date", 
+        "Submit Date", "Opening Date", "Price"
     ]
-    cell_style = styles["BodyText"]
-    cell_style.fontSize = 6
-    cell_style.leading = 8
-    cell_style.spaceBefore = 0
-    cell_style.spaceAfter = 0
-    header_style = ParagraphStyle(
-        'tableHeader',
-        parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=8,
-        leading=10,
-        textColor=colors.white,
-        alignment=1,
-    )
-    wrapped_headers = []
-    for header in headers:
-        if header in ('Inquiry deadline', 'Submission deadline'):
-            wrapped_headers.append(Paragraph(header.replace(' ', '<br/>', 1), header_style))
-        elif ' / ' in header:
-            wrapped_headers.append(Paragraph(header.replace(' / ', '<br/>/ '), header_style))
-        else:
-            wrapped_headers.append(Paragraph(header, header_style))
-    data = [wrapped_headers]
+    if rows and any('\u0600' <= c <= '\u06FF' for cell in rows[0] for c in str(cell)):
+        headers = [
+            "العنوان", "الناشر", "النوع", "النشاط", "التصنيف",
+            "القيمة المرجعية", "تاريخ النشر", "اخر موعد للاستفسارات",
+            "اخر موعد للتقديم", "تاريخ فتح المظاريف", "قيمة الكراسة"
+        ]
+
+    rendered_headers = [Paragraph(render_arabic(h), ParagraphStyle('h', fontName=font_name, fontSize=8, textColor=colors.white)) for h in headers]
+    data = [rendered_headers]
+    
     for i, row in enumerate(rows, start=1):
-        data.append([Paragraph(str(i), cell_style)] + [Paragraph(str(cell or ""), cell_style) for cell in row])
-    col_widths = [8*mm, 75*mm, 33*mm, 26*mm, 20*mm, 18*mm, 25*mm, 18*mm, 18*mm, 18*mm, 18*mm, 12*mm]
-    table = Table(data, colWidths=col_widths, repeatRows=1)
+        rendered_row = []
+        for cell in row:
+            rendered_row.append(Paragraph(render_arabic(cell), ParagraphStyle('c', fontName=font_name, fontSize=7)))
+        data.append(rendered_row)
+
+    col_widths = [50*mm, 30*mm, 20*mm, 20*mm, 20*mm, 20*mm, 20*mm, 20*mm, 20*mm, 20*mm, 15*mm]
+    table = Table(data, colWidths=col_widths[:len(headers)], repeatRows=1)
     table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.red),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#B91C1C")),
         ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, 0), 8),
-        ("FONTSIZE", (0, 1), (-1, -1), 8),
-        ("ALIGN", (0, 0), (-1, 0), "CENTER"),
-        ("ALIGN", (0, 1), (-1, -1), "CENTER"),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 1),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 1),
-        ("TOPPADDING", (0, 0), (-1, -1), 2),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
-        ("GRID", (0, 0), (-1, 0), 0.5, colors.white),
-        ("GRID", (0, 1), (-1, -1), 0.5, colors.red),
-        ("BOX", (0, 0), (-1, -1), 0.5, colors.red),
-        ("LINEABOVE", (0, 0), (-1, 0), 0.5, colors.white),
-        ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.white),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 6),
     ]))
     story.append(table)
+
     doc = SimpleDocTemplate(
         path,
         pagesize=landscape(A4),
-        rightMargin=15,
-        leftMargin=15,
-        topMargin=35 * mm,
-        bottomMargin=24 * mm,
+        rightMargin=10*mm,
+        leftMargin=10*mm,
+        topMargin=20*mm,
+        bottomMargin=15*mm
     )
-    doc.build(story, onFirstPage=lambda canvas_obj, doc: (draw_page_header(canvas_obj, doc, company_name, logo_path), add_footer(canvas_obj, doc)), onLaterPages=lambda canvas_obj, doc: (draw_page_header(canvas_obj, doc, company_name, logo_path), add_footer(canvas_obj, doc)))
-
-
-def send_email(pdf_path, email_to):
-    if not all([SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, email_to]):
-        raise RuntimeError("SMTP or email variables missing. Check .env")
-    now = datetime.now().strftime("%Y-%m-%d")
-    subject = f"{REPORT_TITLE} – {now}"
-    body = "Attached is today’s generated Etimad tenders report in PDF format."
-    msg = MIMEMultipart()
-    msg["From"] = EMAIL_FROM
-    msg["To"] = email_to
-    msg["Subject"] = subject
-    msg.attach(MIMEText(body, "plain"))
-    with open(pdf_path, "rb") as f:
-        part = MIMEApplication(f.read(), _subtype="pdf")
-        part.add_header("Content-Disposition", "attachment", filename=os.path.basename(pdf_path))
-        msg.attach(part)
-    context = ssl.create_default_context()
-    if SMTP_PORT == 465:
-        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=context, timeout=30) as server:
-            server.login(SMTP_USER, SMTP_PASS)
-            server.send_message(msg)
-    else:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as server:
-            server.starttls(context=context)
-            server.login(SMTP_USER, SMTP_PASS)
-            server.send_message(msg)
+    
+    doc.build(story, 
+              onFirstPage=lambda canvas_obj, doc: (draw_page_header(canvas_obj, doc, company_name, logo_path), add_footer(canvas_obj, doc)),
+              onLaterPages=lambda canvas_obj, doc: (draw_page_header(canvas_obj, doc, company_name, logo_path), add_footer(canvas_obj, doc)))
 
 
 def main():
