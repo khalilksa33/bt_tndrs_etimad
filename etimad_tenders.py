@@ -429,6 +429,40 @@ def build_pdf(rows, path, company_name=None, logo_path=None):
               onLaterPages=lambda canvas_obj, doc: (draw_page_header(canvas_obj, doc, company_name, logo_path), add_footer(canvas_obj, doc)))
 
 
+def send_email(pdf_path, email_to):
+    import smtplib
+    import ssl
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.application import MIMEApplication
+    from datetime import datetime
+    import os
+
+    if not all([SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, email_to]):
+        raise RuntimeError("SMTP or email variables missing. Check .env")
+    now = datetime.now().strftime("%Y-%m-%d")
+    subject = f"{REPORT_TITLE} – {now}"
+    body = "Attached is today’s generated tenders report in PDF format."
+    msg = MIMEMultipart()
+    msg["From"] = EMAIL_FROM
+    msg["To"] = email_to
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "plain"))
+    with open(pdf_path, "rb") as f:
+        part = MIMEApplication(f.read(), _subtype="pdf")
+        part.add_header("Content-Disposition", "attachment", filename=os.path.basename(pdf_path))
+        msg.attach(part)
+    context = ssl.create_default_context()
+    if SMTP_PORT == 465:
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=context, timeout=30) as server:
+            server.login(SMTP_USER, SMTP_PASS)
+            server.send_message(msg)
+    else:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as server:
+            server.starttls(context=context)
+            server.login(SMTP_USER, SMTP_PASS)
+            server.send_message(msg)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--email', help='Send report only to this specific email')
