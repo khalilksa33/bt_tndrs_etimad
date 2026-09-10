@@ -1,9 +1,17 @@
 import re
 
-with open('etimad_tenders.py', 'r', encoding='utf-8') as f:
-    code = f.read()
+for filename in ['forsah_tenders.py', 'etimad_tenders.py']:
+    with open(filename, 'r', encoding='utf-8') as f:
+        code = f.read()
 
-code = code.replace('"https://tenders.etimad.sa/Tender/AllTendersForVisitor"', '"https://tenders.etimad.sa/ar/Tender/AllTendersForVisitor"')
+    # Add datetime timezone import if needed
+    if 'from datetime import datetime, timedelta, timezone' not in code:
+        code = code.replace('from datetime import datetime', 'from datetime import datetime, timedelta, timezone')
 
-with open('etimad_tenders.py', 'w', encoding='utf-8') as f:
-    f.write(code)
+    # Replace datetime.now() with datetime.now(timezone(timedelta(hours=3)))
+    code = code.replace('current_hour = datetime.now().strftime("%H:00")', 'current_hour = datetime.now(timezone(timedelta(hours=3))).strftime("%H:00")')
+    code = code.replace("today = datetime.now().strftime('%Y-%m-%d')", "today = datetime.now(timezone(timedelta(hours=3))).strftime('%Y-%m-%d')")
+    code = code.replace('datetime.now().strftime("%Y%m%d")', 'datetime.now(timezone(timedelta(hours=3))).strftime("%Y%m%d")')
+
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(code)

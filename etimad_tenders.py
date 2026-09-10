@@ -8,7 +8,7 @@ import argparse
 import urllib.request
 import urllib.parse
 import smtplib
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
@@ -455,7 +455,7 @@ def main():
     reported_file = 'reported_etimad_tenders.json'
     with open(reported_file, 'w', encoding='utf-8') as f:
         json.dump({row[5]: row for row in english_rows}, f, indent=2, ensure_ascii=False)
-    today = datetime.now().strftime("%Y%m%d")
+    today = datetime.now(timezone(timedelta(hours=3))).strftime("%Y%m%d")
     report_dir = os.path.join('reports', today)
     os.makedirs(report_dir, exist_ok=True)
     conn = sqlite3.connect(DATABASE_PATH)
@@ -467,7 +467,7 @@ def main():
             companies = conn.execute("SELECT * FROM companies WHERE (status IS NULL OR status = 'Active') AND (portals IS NULL OR portals = 'Both' OR portals = 'Etimad')").fetchall()
             
             # Filter by scheduled time
-            current_hour = datetime.now().strftime("%H:00")
+            current_hour = datetime.now(timezone(timedelta(hours=3))).strftime("%H:00")
             filtered_companies = []
             for c in companies:
                 try:
