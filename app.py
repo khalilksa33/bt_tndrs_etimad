@@ -1217,7 +1217,7 @@ def admin_edit(id):
         
     company = conn.execute('SELECT * FROM companies WHERE id = ?', (id,)).fetchone()
     conn.close()
-    return render_template_string(ADMIN_HTML, active_tab='edit', company=company)
+    return render_template_string(ADMIN_HTML, active_tab='edit', company=dict(company) if company else None)
 
 @app.route('/admin/settings/test')
 @requires_auth
