@@ -260,7 +260,7 @@ def fetch_rows():
     arabic_rows = []
     
     try:
-        driver.get("https://tenders.etimad.sa/Tender/AllTendersForVisitor")
+        driver.get("https://tenders.etimad.sa/ar/Tender/AllTendersForVisitor")
         # Wait for the page to load the tender cards. We wait for a generic class that usually wraps the tenders.
         # Note: Since Etimad's HTML layout updates often, you may need to adjust these CSS selectors.
         time.sleep(5) # Let WAF clear
