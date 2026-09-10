@@ -884,7 +884,7 @@ ADMIN_HTML = '''<!DOCTYPE html>
                                 <option value="Arabic" {% if company and company['language'] == 'Arabic' %}selected{% endif %}>Arabic</option>
                             </select>
                         </div>
-                        <div>                          <div>
+                                                  <div>
                               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subscription Type</label>
                               <select name="subscription_type" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border p-2">
                                   <option value="Monthly" {% if company and company['subscription_type'] == 'Monthly' %}selected{% endif %}>Monthly</option>
